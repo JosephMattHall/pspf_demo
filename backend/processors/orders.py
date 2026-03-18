@@ -1,4 +1,3 @@
-from pspf import BatchProcessor
 from pspf.context import Context
 from backend.streams.events import OrderCreated, OrderConfirmed, OrderCancelled
 from backend.services.orders import OrderService, OrderStatus

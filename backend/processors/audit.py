@@ -1,4 +1,3 @@
-from pspf import BatchProcessor
 from pspf.context import Context
 import logging
 import json

@@ -1,4 +1,3 @@
-from pspf import BatchProcessor
 from pspf.context import Context
 from backend.streams.events import OrderCreated, StockReceived, StockReserved, LowStockAlert, ProductCreated
 from backend.services.inventory import InventoryService

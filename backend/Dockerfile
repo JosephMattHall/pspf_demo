@@ -18,10 +18,10 @@ RUN pdm config python.use_venv false
 COPY pyproject.toml pdm.lock* README.md ./
 
 # Export requirements and install dependencies globally
-# We run `pdm lock` first to ensure a lockfile exists, then export.
 RUN pdm lock --update-reuse && \
     pdm export -f requirements --without-hashes > requirements.txt && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install pspf==0.1.0b1
 
 # Copy application code to /app/backend
 COPY . backend/

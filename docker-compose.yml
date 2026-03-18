@@ -36,12 +36,14 @@ services:
     command: uvicorn backend.api.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./backend:/app/backend
-      - /home/x/projects/Python-Stream-Processing-Framework:/usr/src/pspf
     env_file:
       - ./backend/.env
     environment:
-      - PYTHONPATH=/app:/usr/src/pspf
+      - PYTHONPATH=/app
       - PROMETHEUS_PORT=9090
+      - PSPF_BACKEND=valkey
+      - VALKEY_HOST=valkey
+      - VALKEY_PORT=6379
     ports:
       - "8000:8000"
     depends_on:
@@ -57,12 +59,14 @@ services:
     command: python -m backend.api.worker
     volumes:
       - ./backend:/app/backend
-      - /home/x/projects/Python-Stream-Processing-Framework:/usr/src/pspf
     env_file:
       - ./backend/.env
     environment:
-      - PYTHONPATH=/app:/usr/src/pspf
+      - PYTHONPATH=/app
       - PROMETHEUS_PORT=9090
+      - PSPF_BACKEND=valkey
+      - VALKEY_HOST=valkey
+      - VALKEY_PORT=6379
     depends_on:
       postgres:
         condition: service_healthy

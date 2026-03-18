@@ -8,7 +8,6 @@ from backend.processors.restock import process_restock_event
 from backend.processors.analytics import process_analytics_event
 from backend.processors.alerts import process_alert_event
 from backend.processors.audit import process_audit_event
-from pspf import BatchProcessor
 
 # Setup logging
 logging.basicConfig(level=settings.log_level)
@@ -20,35 +19,29 @@ async def main():
     # Connect Backend
     await stream_client.connect()
     
-    # Initialize Processor
-    # In this simple model, we use one processor instance to poll the stream.
-    # It dispatches to specific handlers based on event_type.
-    # Alternatively, we could have multiple processors (consumer groups) for different domains.
-    # For simplicity, we use one "Monolith Worker" group here, but dispatch logic inside.
-    
-    processor = BatchProcessor(stream_client.backend)
-    
-    async def global_dispatcher(msg_id, data, ctx=None):
-        # Dispatch to all handlers
-        # In a real app, you might want separate consumer groups for Inventory vs Orders 
-        # so they can scale independently. 
-        # Here we run them sequentially for the same message (fan-out logic inside app)
-        # OR we check event type.
-        
-        # NOTE: If we use the SAME consumer group, the message is delivered ONCE to one worker.
-        # So this worker needs to run ALL logic for that event.
-        
-        await process_inventory_event(msg_id, data, ctx)
-        await process_order_event(msg_id, data, ctx)
-        await process_restock_event(msg_id, data, ctx)
-        await process_analytics_event(msg_id, data, ctx)
-        await process_alert_event(msg_id, data, ctx)
-        await process_audit_event(msg_id, data, ctx)
+# Initialize Subscriptions
+# In 0.1.0b1, we can use the @subscribe decorator on the stream object.
+@stream_client.stream.subscribe("streamstock.events")
+async def global_dispatcher(msg_id, data, ctx=None):
+    # Dispatch to all handlers
+    await process_inventory_event(msg_id, data, ctx)
+    await process_order_event(msg_id, data, ctx)
+    await process_restock_event(msg_id, data, ctx)
+    await process_analytics_event(msg_id, data, ctx)
+    await process_alert_event(msg_id, data, ctx)
+    await process_audit_event(msg_id, data, ctx)
 
+async def main():
+    logger.info("Starting StreamStock Workers (0.1.0b1 pattern)...")
+    
+    # Connect Backend
+    await stream_client.connect()
+    
     try:
-        await processor.run_loop(global_dispatcher)
-    except KeyboardInterrupt:
-        await processor.shutdown()
+        # run_forever handles all registered subscriptions concurrently
+        await stream_client.stream.run_forever()
+    except asyncio.CancelledError:
+        logger.info("Worker loop stopped.")
     finally:
         await stream_client.close()
 

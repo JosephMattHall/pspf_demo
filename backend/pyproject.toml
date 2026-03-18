@@ -6,6 +6,7 @@ authors = [
     {name = "StreamStock Team", email = "dev@streamstock.io"},
 ]
 dependencies = [
+    "pspf==0.1.0b1",
     "fastapi>=0.100.0",
     "uvicorn[standard]>=0.22.0",
     "sqlalchemy[asyncio]>=2.0.0",
@@ -13,16 +14,6 @@ dependencies = [
     "pydantic-settings>=2.0.0",
     "redis>=5.0.0",  # For Valkey
     "valkey>=0.1.0", # Required by PSPF
-    "python-multipart>=0.0.6",
-    # PSPF Dependencies
-    "aiofiles>=23.0.0",
-    "msgpack>=1.0.0",
-    "protobuf>=4.0.0",
-    "opentelemetry-api>=1.20.0",
-    "opentelemetry-sdk>=1.20.0",
-    "prometheus-client>=0.17.0",
-    "typer>=0.9.0",
-    "aiosqlite>=0.19.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
